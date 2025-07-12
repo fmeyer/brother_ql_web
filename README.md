@@ -14,14 +14,14 @@ There's also a screenshot showing [how it looks on a smartphone](./static/images
 ### Installation
 
 **ProTip™**: If you know how to use Docker, you might want to use the ready-to-use Docker image to deploy this software.
-It can be found [on the Docker hub](https://hub.docker.com/r/pklaus/brother_ql_web/) (note: this still points to the original repository's Docker image).
+It can be found [on the Docker hub](https://hub.docker.com/r/fmeyer/brother_ql_web/).
 Otherwise, follow the instructions below.
 
 Get the code:
 
-    git clone https://github.com/fmeyer/brother_ql_web.git
+    git clone https://github.com/pklaus/brother_ql_web.git
 
-or download [the ZIP file](https://github.com/fmeyer/brother_ql_web/archive/master.zip) and unpack it.
+or download [the ZIP file](https://github.com/pklaus/brother_ql_web/archive/master.zip) and unpack it.
 
 Install the requirements:
 

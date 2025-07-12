@@ -664,6 +664,7 @@ def main():
     global DEBUG, BACKEND_CLASS, CONFIG
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--host', default='0.0.0.0', help='Host to run server on')
     parser.add_argument('--port', default=False, help='Port to run server on')
     parser.add_argument('--loglevel', type=lambda x: getattr(logging, x.upper()),
                        default=False, help='Log level')
@@ -718,7 +719,7 @@ def main():
 
     # Start server
     port = args.port or CONFIG['SERVER']['PORT']
-    host = CONFIG['SERVER']['HOST']
+    host = args.host or CONFIG['SERVER']['HOST']
 
     logger.info(f"Starting Brother QL Web server on {host}:{port}")
     run(host=host, port=port, debug=DEBUG)
