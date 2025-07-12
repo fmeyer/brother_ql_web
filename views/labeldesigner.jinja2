@@ -1,203 +1,1593 @@
+{# Enhanced Label Designer with Advanced Features #}
 {% extends "base.jinja2" %}
 
-{% block page_title %}{{ title }}{% endblock %}
+{% block header %}
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white animate-slide-up">{{ website['PAGE_TITLE'] }}</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300 animate-slide-up" style="animation-delay: 100ms;">{{ website['PAGE_HEADLINE'] }}</p>
+        </div>
 
-{% block jumbotron %}
-  <h1>{{ website['PAGE_TITLE'] }}</h1>
-  <p>{{ website['PAGE_HEADLINE'] }}</p>
-  <!--<p><a class="btn btn-primary btn-lg" href="#" role="button">History of printed labels</a></p>-->
+        <!-- Header Actions -->
+        <div class="flex items-center space-x-3 animate-slide-up" style="animation-delay: 200ms;">
+            <button id="loadTemplateBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Templates
+            </button>
+
+            <button id="saveTemplateBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                </svg>
+                Save
+            </button>
+
+            <button id="clearAllBtn" class="inline-flex items-center px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Clear
+            </button>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-md-4">
-      <fieldset class="form-group">
-        <div class="panel-group" id="accordion">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Label Size</a>
-              </h4>
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+    <!-- Enhanced Settings Panel -->
+    <div class="xl:col-span-1 space-y-6">
+        <!-- Quick Templates -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-5 animate-scale-in">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Quick Start
+            </h3>
+
+            <div class="grid grid-cols-2 gap-2">
+                <button class="template-btn p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group"
+                        data-template="name-tag">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300">Name Tag</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Standard format</div>
+                </button>
+
+                <button class="template-btn p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group"
+                        data-template="address">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300">Address</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shipping label</div>
+                </button>
+
+                <button class="template-btn p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group"
+                        data-template="barcode">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300">QR Code</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">With text</div>
+                </button>
+
+                <button class="template-btn p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group"
+                        data-template="custom">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-700 dark:group-hover:text-primary-300">Custom</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Blank canvas</div>
+                </button>
             </div>
-            <div id="collapse1" class="panel-collapse collapse">
-              <div class="chooser panel-body">
-              <label for="labelSize" style="display: none">Label Size:</label>
-              <select class="form-control" id="labelSize" onChange="preview()">
-                {% for label_size in label_sizes %}<option value="{{label_size[0]}}" {% if label['DEFAULT_SIZE'] == label_size[0] %}selected{% endif %}>{{label_size[1]}}</option>{% endfor %}
-              </select>
-              <label for="orientation" style="margin-top: 10px; margin-bottom: 0">Label Orientation:</label>
-              <div class="radio" style="margin-top: 5px;">
-                <label><input type="radio" onchange="preview()" name="orientation" value="standard" {% if default_orientation == 'standard' %}checked{% endif %}>Standard</label>
-              </div>
-              <div class="radio">
-                <label><input type="radio" onchange="preview()" name="orientation" value="rotated" {% if default_orientation == 'rotated' %}checked{% endif %}>Rotated</label>
-              </div>
-              </div> <!-- class="chooser panel-body" -->
-            </div>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-                  <span class="glyphicon glyphicon-text-size" aria-hidden="true"></span>
-                  Font Settings
-                </a>
-              </h4>
-            </div>
-            <div id="collapse2" class="panel-collapse collapse in">
-              <div class="chooser panel-body">
-              <label for="fontFamily">Font Family:</label>
-              <select class="form-control" id="fontFamily" onChange="preview()">
-                {% for font_family_name in font_family_names %}
-                  {% for font_style in fonts[font_family_name].keys() %}
-                    <option {% if label['DEFAULT_FONTS']['style'] == font_style and label['DEFAULT_FONTS']['family'] == font_family_name %}selected{% endif %}>{{font_family_name}} ({{ font_style }})</option>
-                  {% endfor %}
-                {% endfor %}
-              </select>
-              <label for="fontSize" >Font Size:</label>
-              <input id="fontSize" class="form-control" type="number" min="1" value="{{ label['DEFAULT_FONT_SIZE'] }}" onChange="preview()" required>
-              <label for="fontAlign" class="control-label input-group">Font Alignment:</label>
-              <div class="btn-group" data-toggle="buttons">
-                  <label class="btn btn-default">
-                      <input type="radio" name="fontAlign" onchange="preview()" value="left" aria-label="Left Align"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
-                  </label>
-                  <label class="btn btn-default active">
-                      <input type="radio" name="fontAlign" onchange="preview()" value="center" aria-label="Center Align" checked=""><span class="glyphicon glyphicon-align-center" aria-hidden="true"></span>
-                  </label>
-                  <label class="btn btn-default">
-                      <input type="radio" name="fontAlign" onchange="preview()" value="right" aria-label="Right Align"><span class="glyphicon glyphicon-align-right" aria-hidden="true"></span>
-                  </label>
-              </div>
-              </div> <!-- class="chooser panel-body" -->
-            </div>
-          </div>
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                  Detailed Settings
-                </a>
-              </h4>
-            </div>
-            <div id="collapse3" class="panel-collapse collapse">
-              <div class="chooser panel-body">
-              <label for="marginTop">Margin Top:</label>
-              <div class="input-group marginsTopBottom">
-                <input id="marginTop" class="form-control" type="number" min="0" max="200" value="24" onChange="preview()" required>    <span class="input-group-addon">%</span>
-              </div>
-              <label for="marginBottom">Margin Bottom:</label>
-              <div class="input-group marginsTopBottom">
-                <input id="marginBottom" class="form-control" type="number" min="0" max="200" value="45" onChange="preview()" required> <span class="input-group-addon">%</span>
-              </div>
-              <label for="marginLeft">Margin Left:</label>
-              <div class="input-group marginsLeftRight">
-                <input id="marginLeft" class="form-control" type="number" min="0" max="200" value="35" onChange="preview()" required>   <span class="input-group-addon">%</span>
-              </div>
-              <label for="marginRight">Margin Right:</label>
-              <div class="input-group marginsLeftRight">
-                <input id="marginRight" class="form-control" type="number" min="0" max="200" value="35" onChange="preview()" required>  <span class="input-group-addon">%</span>
-              </div>
-              </div> <!-- class="chooser panel-body" -->
-            </div>
-          </div>
         </div>
-      </fieldset>
-    </div>
-    <div class="col-md-4">
-      <fieldset class="form-group">
-        <label for="labelText">Label Text:</label>
-        <textarea rows="7" id="labelText" class="form-control" onChange="preview()" onInput="preview()"></textarea>
-      </fieldset>
-    </div>
-    <div class="col-md-4">
-      <fieldset class="form-group">
-        <label for="previewImg">Label Preview:</label><br />
-        <img id="previewImg" style="border: 1px solid #444; max-height: 350px; width: auto; max-width: 100%; margin-bottom: 10px;"/>
-        <p>Printed size w/o margins: <span id="labelWidth">?</span> cm x <span id="labelHeight">?</span> cm</p>
-        <button id="printButton" type="button" class="btn btn-primary btn-block btn-lg" onClick="print()">
-          <span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print
-        </button>
-      </fieldset>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title"><span class="glyphicon glyphicon-console" aria-hidden="true" style="margin-right: 0.3em"></span> Status</h3>
+
+        <!-- Label Settings -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-5 animate-scale-in" style="animation-delay: 100ms;">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                Label Settings
+            </h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="labelSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size</label>
+                    <select id="labelSize" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                        {% for label_size in label_sizes %}
+                        <option value="{{label_size[0]}}" {% if label['DEFAULT_SIZE'] == label_size[0] %}selected{% endif %}>
+                            {{label_size[1]}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Orientation</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="relative flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="orientation" value="standard"
+                                   {% if default_orientation == 'standard' %}checked{% endif %}
+                                   class="sr-only">
+                            <div class="flex items-center">
+                                <div class="radio-indicator w-4 h-4 border-2 border-gray-300 dark:border-gray-600 rounded-full mr-3 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-primary-600 rounded-full hidden"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">Standard</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Horizontal</span>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <input type="radio" name="orientation" value="rotated"
+                                   {% if default_orientation == 'rotated' %}checked{% endif %}
+                                   class="sr-only">
+                            <div class="flex items-center">
+                                <div class="radio-indicator w-4 h-4 border-2 border-gray-300 dark:border-gray-600 rounded-full mr-3 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-primary-600 rounded-full hidden"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">Rotated</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Vertical</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Margins</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Top/Bottom</label>
+                            <input type="range" id="marginVertical" min="0" max="20" value="5" class="w-full accent-primary-600">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                                <span id="marginVerticalValue">5</span>mm
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Left/Right</label>
+                            <input type="range" id="marginHorizontal" min="0" max="20" value="5" class="w-full accent-primary-600">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                                <span id="marginHorizontalValue">5</span>mm
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="statusPanel" class="panel-body">
-          - undefined -
+
+        <!-- Font & Style Settings -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-5 animate-scale-in" style="animation-delay: 200ms;">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                Typography
+            </h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="fontFamily" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Font Family</label>
+                    <div class="relative">
+                        <select id="fontFamily" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors pr-10">
+                            {% for font_family_name in font_family_names %}
+                                {% for font_style in fonts[font_family_name].keys() %}
+                                    <option value="{{font_family_name}} ({{ font_style }})" {% if default_font_config['style'] == font_style and default_font_config['family'] == font_family_name %}selected{% endif %}>
+                                        {{font_family_name}} ({{ font_style }})
+                                    </option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+                        <div id="fontPreview" class="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center text-lg border border-gray-200 dark:border-gray-600">
+                            The quick brown fox
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="fontSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Font Size</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="range" id="fontSizeSlider" min="8" max="200" value="{{ label['DEFAULT_FONT_SIZE'] }}" class="w-20 flex-1 accent-primary-600">
+                        <input type="number" id="fontSize" value="{{ label['DEFAULT_FONT_SIZE'] }}" min="8" max="200"
+                               class="w-20 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">pt</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Text Alignment</label>
+                    <div class="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                        <button type="button" data-align="left" class="alignment-btn flex-1 px-4 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h4"></path>
+                            </svg>
+                        </button>
+                        <button type="button" data-align="center" class="alignment-btn flex-1 px-4 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center border-l border-r border-gray-300 dark:border-gray-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M8 12h8M6 18h12"></path>
+                            </svg>
+                        </button>
+                        <button type="button" data-align="right" class="alignment-btn flex-1 px-4 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M12 12h8M14 18h6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Text Style</label>
+                    <div class="flex space-x-2">
+                        <button type="button" id="boldBtn" class="style-btn px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors font-bold">
+                            B
+                        </button>
+                        <button type="button" id="italicBtn" class="style-btn px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors italic">
+                            I
+                        </button>
+                        <button type="button" id="underlineBtn" class="style-btn px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors underline">
+                            U
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- Advanced Features -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-5 animate-scale-in" style="animation-delay: 300ms;">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                </svg>
+                Advanced
+            </h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="enableQR" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add QR Code</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="enableBorder" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add Border</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="enableLogo" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add Logo</span>
+                    </label>
+                </div>
+
+                <div id="logoUpload" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Logo File</label>
+                    <div id="dropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-primary-400 dark:hover:border-primary-500 transition-colors cursor-pointer">
+                        <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-medium">Click to upload</span> or drag and drop
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG up to 2MB</p>
+                    </div>
+                    <input type="file" id="logoFile" accept="image/*" class="hidden">
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Enhanced Text Input Area -->
+    <div class="xl:col-span-2 space-y-6">
+        <!-- Text Editor -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in" style="animation-delay: 100ms;">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Label Content
+                    </h3>
+
+                    <div class="flex items-center space-x-2">
+                        <span id="charCounter" class="text-sm text-gray-500 dark:text-gray-400">0 characters</span>
+                        <div class="flex space-x-1">
+                            <button id="undoBtn" class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Undo (Ctrl+Z)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                </svg>
+                            </button>
+                            <button id="redoBtn" class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Redo (Ctrl+Y)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6-6m6 6l-6 6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5">
+                <div class="space-y-4">
+                    <!-- Multi-line Text Editor -->
+                    <div id="textLayers" class="space-y-3">
+                        <div class="text-layer" data-layer="0">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Line 1</label>
+                                <button class="add-line-btn text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm">
+                                    + Add Line
+                                </button>
+                            </div>
+                            <textarea class="line-text w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"
+                                      rows="3" placeholder="Enter your text here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Smart Suggestions -->
+                    <div id="suggestions" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suggestions</label>
+                        <div class="flex flex-wrap gap-2" id="suggestionsList">
+                            <!-- Dynamic suggestions will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Variable Insertion -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Insert Variables</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="variable-btn px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/20 transition-colors" data-variable="{{DATE}}">
+                                Date
+                            </button>
+                            <button class="variable-btn px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/20 transition-colors" data-variable="{{TIME}}">
+                                Time
+                            </button>
+                            <button class="variable-btn px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/20 transition-colors" data-variable="{{COUNTER}}">
+                                Counter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Settings -->
+        <div id="qrSettings" class="hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                    </svg>
+                    QR Code Settings
+                </h3>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div>
+                    <label for="qrData" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">QR Code Data</label>
+                    <textarea id="qrData" rows="3" placeholder="Enter URL, text, or data to encode..."
+                              class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="qrSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size</label>
+                        <select id="qrSize" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="qrPosition" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position</label>
+                        <select id="qrPosition" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right" selected>Right</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Preview and Actions Panel -->
+    <div class="xl:col-span-1 space-y-6">
+        <!-- Live Preview -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in" style="animation-delay: 200ms;">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        Live Preview
+                    </h3>
+
+                    <div class="flex items-center space-x-2">
+                        <button id="zoomOutBtn" class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10h-6"></path>
+                            </svg>
+                        </button>
+                        <span id="zoomLevel" class="text-xs text-gray-500 dark:text-gray-400">100%</span>
+                        <button id="zoomInBtn" class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-5">
+                <div id="previewContainer" class="relative bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden min-h-[300px] flex items-center justify-center">
+                    <div id="previewLoader" class="flex flex-col items-center space-y-4">
+                        <div class="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Generating preview...</p>
+                    </div>
+
+                    <img id="previewImage" class="hidden max-w-full max-h-full object-contain transition-transform duration-200" alt="Label preview">
+
+                    <div id="previewPlaceholder" class="text-center text-gray-400 dark:text-gray-500">
+                        <svg class="mx-auto h-16 w-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        <p class="text-lg font-medium">Your label preview will appear here</p>
+                        <p class="text-sm">Start typing to see a live preview</p>
+                    </div>
+                </div>
+
+                <!-- Preview Info -->
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div class="flex items-center space-x-4">
+                        <span>Size: <span id="labelDimensions" class="font-medium">? x ? cm</span></span>
+                        <span>DPI: <span class="font-medium">300</span></span>
+                    </div>
+                    <button id="fullPreviewBtn" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                        Full Size
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Actions -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in" style="animation-delay: 300ms;">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                    </svg>
+                    Print Actions
+                </h3>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <!-- Print Quantity -->
+                <div>
+                    <label for="printQuantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
+                    <div class="flex items-center space-x-3">
+                        <button id="decreaseQty" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                            </svg>
+                        </button>
+                        <input type="number" id="printQuantity" value="1" min="1" max="100"
+                               class="flex-1 text-center rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <button id="increaseQty" class="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Print Button -->
+                <button id="printButton" type="button"
+                        class="w-full flex items-center justify-center px-6 py-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <svg id="printIcon" class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                    </svg>
+                    <span id="printText">Print Label</span>
+                </button>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="downloadBtn" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download
+                    </button>
+
+                    <button id="shareBtn" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                        </svg>
+                        Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Print Queue -->
+        <div id="printQueue" class="hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Print Queue
+                </h3>
+            </div>
+
+            <div class="p-5">
+                <div id="queueList" class="space-y-2">
+                    <!-- Dynamic queue items will be populated here -->
+                </div>
+
+                <div class="mt-4 flex space-x-2">
+                    <button id="clearQueueBtn" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Clear Queue
+                    </button>
+                    <button id="printAllBtn" class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
+                        Print All
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div id="statusContainer" class="hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Status
+                </h3>
+            </div>
+
+            <div class="p-5">
+                <div id="statusMessage" class="rounded-lg p-4"></div>
+
+                <div id="progressContainer" class="hidden mt-4">
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <span>Progress</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div id="progressBar" class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Modal -->
+<div id="templateModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 text-center">
+        <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Label Templates</h3>
+                    <button id="closeTemplateModal" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4" id="templateGrid">
+                    <!-- Templates will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Full Preview Modal -->
+<div id="fullPreviewModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 flex items-center justify-center">
+        <div class="relative max-w-4xl w-full">
+            <button id="closeFullPreview" class="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-10">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-8">
+                <img id="fullPreviewImage" class="w-full h-auto rounded-lg shadow-lg" alt="Full size preview">
+
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button id="downloadFullBtn" class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        Download High-Res
+                    </button>
+                    <button id="printFromFullBtn" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Print This
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
-{% block javascript %}
-var text = $('#labelText');
+{% block scripts %}
+<script>
+// Enhanced Label Designer with Advanced Features
+const AdvancedLabelDesigner = {
+    init() {
+        this.setupElements();
+        this.setupState();
+        this.bindEvents();
+        this.setupTemplates();
+        this.initializeDefaults();
+        this.startAutoPreview();
+    },
 
-function formData() {
-  //var text = $('#labelText').val().replace(/\n/g, "%0A");
-  var text = $('#labelText').val();
-  if (text == '') text = ' ';
-  return {
-    text:        text,
-    font_family: $('#fontFamily option:selected').text(),
-    font_size:   $('#fontSize').val(),
-    label_size:  $('#labelSize option:selected').val(),
-    align:       $('input[name=fontAlign]:checked').val(),
-    orientation: $('input[name=orientation]:checked').val(),
-    margin_top:    $('#marginTop').val(),
-    margin_bottom: $('#marginBottom').val(),
-    margin_left:   $('#marginLeft').val(),
-    margin_right:  $('#marginRight').val()
-  }
-}
+    setupElements() {
+        this.elements = {
+            // Basic controls
+            labelSize: document.getElementById('labelSize'),
+            orientation: document.getElementsByName('orientation'),
+            fontFamily: document.getElementById('fontFamily'),
+            fontSize: document.getElementById('fontSize'),
+            fontSizeSlider: document.getElementById('fontSizeSlider'),
+            alignmentBtns: document.querySelectorAll('.alignment-btn'),
 
-function preview() {
-  if ($('input[name=orientation]:checked').val() == 'standard') {
-    $('.marginsTopBottom').prop('disabled', false).removeAttr('title');
-    $('.marginsLeftRight').prop('disabled', true).prop('title',  'Only relevant if rotated orientation is selected.');
-  } else {
-    $('.marginsTopBottom').prop('disabled', true).prop('title',  'Only relevant if standard orientation is selected.');
-    $('.marginsLeftRight').prop('disabled', false).removeAttr('title');
-  }
-  $.ajax({
-    type:        'POST',
-    url:         '/api/preview/text?return_format=base64',
-    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-    data:        formData(),
-    success: function( data ) {
-      $('#previewImg').attr('src', 'data:image/png;base64,' + data);
-      var img = $('#previewImg')[0];
-      img.onload = function() {
-        $('#labelWidth').html( (img.naturalWidth /300*2.54).toFixed(1));
-        $('#labelHeight').html((img.naturalHeight/300*2.54).toFixed(1));
-      };
+            // Text and styling
+            textLayers: document.getElementById('textLayers'),
+            fontPreview: document.getElementById('fontPreview'),
+            boldBtn: document.getElementById('boldBtn'),
+            italicBtn: document.getElementById('italicBtn'),
+            underlineBtn: document.getElementById('underlineBtn'),
+
+            // Advanced features
+            enableQR: document.getElementById('enableQR'),
+            enableBorder: document.getElementById('enableBorder'),
+            enableLogo: document.getElementById('enableLogo'),
+            qrSettings: document.getElementById('qrSettings'),
+            logoUpload: document.getElementById('logoUpload'),
+
+            // Preview
+            previewContainer: document.getElementById('previewContainer'),
+            previewImage: document.getElementById('previewImage'),
+            previewLoader: document.getElementById('previewLoader'),
+            previewPlaceholder: document.getElementById('previewPlaceholder'),
+            labelDimensions: document.getElementById('labelDimensions'),
+
+            // Print controls
+            printButton: document.getElementById('printButton'),
+            printQuantity: document.getElementById('printQuantity'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            shareBtn: document.getElementById('shareBtn'),
+
+            // Status
+            statusContainer: document.getElementById('statusContainer'),
+            statusMessage: document.getElementById('statusMessage'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressBar: document.getElementById('progressBar'),
+            progressPercent: document.getElementById('progressPercent'),
+
+            // Modals
+            templateModal: document.getElementById('templateModal'),
+            fullPreviewModal: document.getElementById('fullPreviewModal'),
+            fullPreviewImage: document.getElementById('fullPreviewImage')
+        };
+    },
+
+    setupState() {
+        this.state = {
+            currentAlignment: 'center',
+            textStyles: {
+                bold: false,
+                italic: false,
+                underline: false
+            },
+            zoom: 100,
+            previewTimeout: null,
+            undoStack: [],
+            redoStack: [],
+            printQueue: [],
+            isPreviewLoading: false
+        };
+    },
+
+    bindEvents() {
+        // Basic controls
+        this.elements.labelSize.addEventListener('change', () => this.schedulePreview());
+        this.elements.orientation.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.updateRadioVisual(radio);
+                this.schedulePreview();
+            });
+        });
+
+        // Font controls
+        this.elements.fontFamily.addEventListener('change', () => {
+            this.updateFontPreview();
+            this.schedulePreview();
+        });
+
+        this.syncFontSizeInputs();
+
+        // Alignment buttons
+        this.elements.alignmentBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.setAlignment(e.target.dataset.align);
+            });
+        });
+
+        // Text styling
+        this.elements.boldBtn?.addEventListener('click', () => this.toggleStyle('bold'));
+        this.elements.italicBtn?.addEventListener('click', () => this.toggleStyle('italic'));
+        this.elements.underlineBtn?.addEventListener('click', () => this.toggleStyle('underline'));
+
+        // Advanced features
+        this.elements.enableQR?.addEventListener('change', (e) => {
+            this.elements.qrSettings.classList.toggle('hidden', !e.target.checked);
+            this.schedulePreview();
+        });
+
+        this.elements.enableLogo?.addEventListener('change', (e) => {
+            this.elements.logoUpload.classList.toggle('hidden', !e.target.checked);
+            this.schedulePreview();
+        });
+
+        // QR code settings
+        document.getElementById('qrData')?.addEventListener('input', () => this.schedulePreview());
+        document.getElementById('qrSize')?.addEventListener('change', () => this.schedulePreview());
+        document.getElementById('qrPosition')?.addEventListener('change', () => this.schedulePreview());
+
+        // Print controls
+        this.elements.printButton?.addEventListener('click', () => this.print());
+        this.elements.downloadBtn?.addEventListener('click', () => this.download());
+        this.elements.shareBtn?.addEventListener('click', () => this.share());
+
+        // Quantity controls
+        document.getElementById('increaseQty')?.addEventListener('click', () => {
+            this.elements.printQuantity.value = parseInt(this.elements.printQuantity.value) + 1;
+        });
+
+        document.getElementById('decreaseQty')?.addEventListener('click', () => {
+            const current = parseInt(this.elements.printQuantity.value);
+            if (current > 1) this.elements.printQuantity.value = current - 1;
+        });
+
+        // Template buttons
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.loadTemplate(e.target.dataset.template);
+            });
+        });
+
+        // Text input events
+        this.setupTextLayerEvents();
+
+        // Keyboard shortcuts
+        this.setupKeyboardShortcuts();
+
+        // Variable insertion
+        document.querySelectorAll('.variable-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.insertVariable(e.target.dataset.variable);
+            });
+        });
+
+        // Modal events
+        this.setupModalEvents();
+
+        // Drag and drop
+        this.setupDragAndDrop();
+    },
+
+    setupTextLayerEvents() {
+        const textInputs = document.querySelectorAll('.line-text');
+        textInputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                this.updateCharCounter();
+                this.schedulePreview();
+                this.saveToUndoStack();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    this.addTextLine();
+                }
+            });
+        });
+
+        // Add line button
+        document.querySelectorAll('.add-line-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.addTextLine());
+        });
+    },
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Prevent shortcuts when input is focused
+            if (this.isInputFocused()) return;
+
+            switch(e.key.toLowerCase()) {
+                case 'b':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.toggleStyle('bold');
+                    }
+                    break;
+                case 'i':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.toggleStyle('italic');
+                    }
+                    break;
+                case 'u':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.toggleStyle('underline');
+                    }
+                    break;
+                case 'z':
+                    if (e.ctrlKey && !e.shiftKey) {
+                        e.preventDefault();
+                        this.undo();
+                    } else if (e.ctrlKey && e.shiftKey) {
+                        e.preventDefault();
+                        this.redo();
+                    }
+                    break;
+                case 'y':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.redo();
+                    }
+                    break;
+                case 's':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.saveTemplate();
+                    }
+                    break;
+            }
+        });
+    },
+
+    setupModalEvents() {
+        // Template modal
+        document.getElementById('loadTemplateBtn')?.addEventListener('click', () => {
+            this.elements.templateModal.classList.remove('hidden');
+        });
+
+        document.getElementById('closeTemplateModal')?.addEventListener('click', () => {
+            this.elements.templateModal.classList.add('hidden');
+        });
+
+        // Full preview modal
+        document.getElementById('fullPreviewBtn')?.addEventListener('click', () => {
+            this.showFullPreview();
+        });
+
+        document.getElementById('closeFullPreview')?.addEventListener('click', () => {
+            this.elements.fullPreviewModal.classList.add('hidden');
+        });
+
+        // Save template
+        document.getElementById('saveTemplateBtn')?.addEventListener('click', () => {
+            this.saveTemplate();
+        });
+
+        // Clear all
+        document.getElementById('clearAllBtn')?.addEventListener('click', () => {
+            this.clearAll();
+        });
+    },
+
+    setupDragAndDrop() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('logoFile');
+
+        if (!dropZone || !fileInput) return;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-primary-400');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-primary-400');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-primary-400');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleLogoUpload(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleLogoUpload(e.target.files[0]);
+            }
+        });
+    },
+
+    syncFontSizeInputs() {
+        const fontSize = this.elements.fontSize;
+        const fontSizeSlider = this.elements.fontSizeSlider;
+
+        fontSize.addEventListener('input', () => {
+            fontSizeSlider.value = fontSize.value;
+            this.schedulePreview();
+        });
+
+        fontSizeSlider.addEventListener('input', () => {
+            fontSize.value = fontSizeSlider.value;
+            this.schedulePreview();
+        });
+
+        // Margin sliders
+        const marginVertical = document.getElementById('marginVertical');
+        const marginHorizontal = document.getElementById('marginHorizontal');
+        const marginVerticalValue = document.getElementById('marginVerticalValue');
+        const marginHorizontalValue = document.getElementById('marginHorizontalValue');
+
+        marginVertical?.addEventListener('input', () => {
+            marginVerticalValue.textContent = marginVertical.value;
+            this.schedulePreview();
+        });
+
+        marginHorizontal?.addEventListener('input', () => {
+            marginHorizontalValue.textContent = marginHorizontal.value;
+            this.schedulePreview();
+        });
+    },
+
+    initializeDefaults() {
+        // Set default alignment
+        this.setAlignment('center');
+
+        // Update font preview
+        this.updateFontPreview();
+
+        // Initialize radio visuals
+        this.elements.orientation.forEach(radio => {
+            if (radio.checked) {
+                this.updateRadioVisual(radio);
+            }
+        });
+
+        // Show placeholder
+        this.showPreviewPlaceholder();
+    },
+
+    setupTemplates() {
+        this.templates = {
+            'name-tag': {
+                name: 'Name Tag',
+                text: ['Hello\nMy name is\n[YOUR NAME]'],
+                fontSize: 48,
+                alignment: 'center',
+                labelSize: '62'
+            },
+            'address': {
+                name: 'Address Label',
+                text: ['[Name]\n[Street Address]\n[City, State ZIP]'],
+                fontSize: 24,
+                alignment: 'left',
+                labelSize: '62'
+            },
+            'barcode': {
+                name: 'QR Code Label',
+                text: ['Scan Me!'],
+                fontSize: 36,
+                alignment: 'center',
+                labelSize: '62',
+                enableQR: true,
+                qrData: 'https://example.com'
+            },
+            'custom': {
+                name: 'Custom Label',
+                text: [''],
+                fontSize: 70,
+                alignment: 'center',
+                labelSize: '62'
+            }
+        };
+    },
+
+    // Core functionality methods
+    schedulePreview() {
+        if (this.state.previewTimeout) {
+            clearTimeout(this.state.previewTimeout);
+        }
+
+        this.state.previewTimeout = setTimeout(() => {
+            this.generatePreview();
+        }, 300);
+    },
+
+    async generatePreview() {
+        if (this.state.isPreviewLoading) return;
+
+        try {
+            this.state.isPreviewLoading = true;
+            this.showPreviewLoader();
+
+            const formData = this.getFormData();
+
+            const response = await fetch('/api/preview/text?return_format=base64', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData)
+            });
+
+            if (!response.ok) throw new Error('Preview request failed');
+
+            const base64Data = await response.text();
+            this.showPreviewImage(base64Data);
+
+        } catch (error) {
+            console.error('Preview generation failed:', error);
+            this.showStatus('error', 'Failed to generate preview');
+            this.showPreviewPlaceholder();
+        } finally {
+            this.state.isPreviewLoading = false;
+            this.hidePreviewLoader();
+        }
+    },
+
+    getFormData() {
+        const textLines = Array.from(document.querySelectorAll('.line-text'))
+            .map(input => input.value)
+            .filter(text => text.trim())
+            .join('\n');
+
+        return {
+            text: textLines || ' ',
+            font_family: this.elements.fontFamily.value,
+            font_size: this.elements.fontSize.value,
+            label_size: this.elements.labelSize.value,
+            align: this.state.currentAlignment,
+            orientation: Array.from(this.elements.orientation).find(radio => radio.checked)?.value || 'standard',
+            margin_vertical: document.getElementById('marginVertical')?.value || 5,
+            margin_horizontal: document.getElementById('marginHorizontal')?.value || 5,
+            enable_qr: this.elements.enableQR?.checked ? 'true' : 'false',
+            qr_data: document.getElementById('qrData')?.value || '',
+            qr_size: document.getElementById('qrSize')?.value || 'medium',
+            qr_position: document.getElementById('qrPosition')?.value || 'right',
+            enable_border: this.elements.enableBorder?.checked || false,
+            enable_logo: this.elements.enableLogo?.checked || false
+        };
+    },
+
+    showPreviewImage(base64Data) {
+        this.elements.previewImage.src = `data:image/png;base64,${base64Data}`;
+        this.elements.previewImage.classList.remove('hidden');
+        this.elements.previewPlaceholder.classList.add('hidden');
+
+        this.elements.previewImage.onload = () => {
+            const width = (this.elements.previewImage.naturalWidth / 300 * 2.54).toFixed(1);
+            const height = (this.elements.previewImage.naturalHeight / 300 * 2.54).toFixed(1);
+            this.elements.labelDimensions.textContent = `${width} x ${height} cm`;
+        };
+    },
+
+    showPreviewLoader() {
+        this.elements.previewLoader.classList.remove('hidden');
+        this.elements.previewImage.classList.add('hidden');
+        this.elements.previewPlaceholder.classList.add('hidden');
+    },
+
+    hidePreviewLoader() {
+        this.elements.previewLoader.classList.add('hidden');
+    },
+
+    showPreviewPlaceholder() {
+        this.elements.previewPlaceholder.classList.remove('hidden');
+        this.elements.previewImage.classList.add('hidden');
+    },
+
+    // UI interaction methods
+    setAlignment(alignment) {
+        this.state.currentAlignment = alignment;
+
+        this.elements.alignmentBtns.forEach(btn => {
+            btn.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            btn.classList.add('text-gray-700', 'dark:text-white');
+        });
+
+        const activeBtn = document.querySelector(`[data-align="${alignment}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            activeBtn.classList.remove('text-gray-700', 'dark:text-white');
+        }
+
+        this.schedulePreview();
+    },
+
+    toggleStyle(style) {
+        this.state.textStyles[style] = !this.state.textStyles[style];
+
+        const btn = document.getElementById(`${style}Btn`);
+        if (btn) {
+            if (this.state.textStyles[style]) {
+                btn.classList.add('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            } else {
+                btn.classList.remove('bg-primary-100', 'dark:bg-primary-900', 'text-primary-700', 'dark:text-primary-300');
+            }
+        }
+
+        this.schedulePreview();
+    },
+
+    updateFontPreview() {
+        const fontFamily = this.elements.fontFamily.value;
+        if (this.elements.fontPreview) {
+            this.elements.fontPreview.style.fontFamily = fontFamily.split(' (')[0];
+        }
+    },
+
+    updateRadioVisual(radio) {
+        // Update custom radio button visuals
+        const indicators = document.querySelectorAll('.radio-indicator');
+        indicators.forEach(indicator => {
+            const dot = indicator.querySelector('div');
+            dot.classList.add('hidden');
+        });
+
+        const checkedIndicator = radio.closest('label').querySelector('.radio-indicator div');
+        if (checkedIndicator) {
+            checkedIndicator.classList.remove('hidden');
+        }
+    },
+
+    updateCharCounter() {
+        const textInputs = document.querySelectorAll('.line-text');
+        const totalChars = Array.from(textInputs).reduce((total, input) => total + input.value.length, 0);
+
+        const counter = document.getElementById('charCounter');
+        if (counter) {
+            counter.textContent = `${totalChars} characters`;
+        }
+    },
+
+    addTextLine() {
+        const container = this.elements.textLayers;
+        const layerCount = container.children.length;
+
+        const newLayer = document.createElement('div');
+        newLayer.className = 'text-layer';
+        newLayer.dataset.layer = layerCount;
+
+        newLayer.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Line ${layerCount + 1}</label>
+                <button class="remove-line-btn text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm">
+                    Remove
+                </button>
+            </div>
+            <textarea class="line-text w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"
+                      rows="2" placeholder="Enter text for line ${layerCount + 1}..."></textarea>
+        `;
+
+        container.appendChild(newLayer);
+
+        // Setup events for new layer
+        const textarea = newLayer.querySelector('.line-text');
+        const removeBtn = newLayer.querySelector('.remove-line-btn');
+
+        textarea.addEventListener('input', () => {
+            this.updateCharCounter();
+            this.schedulePreview();
+        });
+
+        removeBtn.addEventListener('click', () => {
+            if (container.children.length > 1) {
+                container.removeChild(newLayer);
+                this.updateCharCounter();
+                this.schedulePreview();
+            }
+        });
+
+        textarea.focus();
+    },
+
+    insertVariable(variable) {
+        const activeInput = document.activeElement;
+        if (activeInput && activeInput.classList.contains('line-text')) {
+            const start = activeInput.selectionStart;
+            const end = activeInput.selectionEnd;
+            const text = activeInput.value;
+
+            activeInput.value = text.substring(0, start) + variable + text.substring(end);
+            activeInput.setSelectionRange(start + variable.length, start + variable.length);
+
+            this.schedulePreview();
+            this.updateCharCounter();
+        }
+    },
+
+    loadTemplate(templateKey) {
+        const template = this.templates[templateKey];
+        if (!template) return;
+
+        // Clear existing text layers
+        const container = this.elements.textLayers;
+        container.innerHTML = '';
+
+        // Create text layers for template
+        template.text.forEach((text, index) => {
+            if (index === 0) {
+                // Update first layer
+                const firstLayer = document.createElement('div');
+                firstLayer.className = 'text-layer';
+                firstLayer.dataset.layer = '0';
+                firstLayer.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Line 1</label>
+                        <button class="add-line-btn text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm">
+                            + Add Line
+                        </button>
+                    </div>
+                    <textarea class="line-text w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"
+                              rows="3" placeholder="Enter your text here...">${text}</textarea>
+                `;
+                container.appendChild(firstLayer);
+            } else {
+                this.addTextLine();
+                const lastInput = container.lastElementChild.querySelector('.line-text');
+                lastInput.value = text;
+            }
+        });
+
+        // Apply template settings
+        this.elements.fontSize.value = template.fontSize;
+        this.elements.fontSizeSlider.value = template.fontSize;
+        this.elements.labelSize.value = template.labelSize;
+        this.setAlignment(template.alignment);
+
+        // Apply advanced settings
+        if (template.enableQR) {
+            this.elements.enableQR.checked = true;
+            this.elements.qrSettings.classList.remove('hidden');
+            document.getElementById('qrData').value = template.qrData || '';
+            if (template.qrSize) document.getElementById('qrSize').value = template.qrSize;
+            if (template.qrPosition) document.getElementById('qrPosition').value = template.qrPosition;
+        }
+
+        // Re-setup events for new elements
+        this.setupTextLayerEvents();
+
+        // Update counters and preview
+        this.updateCharCounter();
+        this.schedulePreview();
+
+        // Show success message
+        this.showToast(`Template "${template.name}" loaded successfully`, 'success');
+    },
+
+    async saveTemplate() {
+        const name = prompt('Enter a name for this template:');
+        if (!name) return;
+
+        const templateData = {
+            name: name,
+            ...this.getFormData(),
+            text: Array.from(document.querySelectorAll('.line-text')).map(input => input.value)
+        };
+
+        try {
+            const response = await fetch('/api/templates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(templateData)
+            });
+
+            if (response.ok) {
+                this.showToast(`Template "${name}" saved successfully`, 'success');
+            } else {
+                throw new Error('Failed to save template');
+            }
+        } catch (error) {
+            this.showToast('Failed to save template', 'error');
+        }
+    },
+
+    clearAll() {
+        if (confirm('Are you sure you want to clear all content?')) {
+            // Clear text inputs
+            document.querySelectorAll('.line-text').forEach(input => {
+                input.value = '';
+            });
+
+            // Reset to defaults
+            this.elements.fontSize.value = {{ label['DEFAULT_FONT_SIZE'] }};
+            this.elements.fontSizeSlider.value = {{ label['DEFAULT_FONT_SIZE'] }};
+            this.setAlignment('center');
+
+            // Clear advanced features
+            this.elements.enableQR.checked = false;
+            this.elements.enableBorder.checked = false;
+            this.elements.enableLogo.checked = false;
+            this.elements.qrSettings.classList.add('hidden');
+            this.elements.logoUpload.classList.add('hidden');
+
+            // Reset QR settings
+            document.getElementById('qrData').value = '';
+            document.getElementById('qrSize').value = 'medium';
+            document.getElementById('qrPosition').value = 'right';
+
+            // Update display
+            this.updateCharCounter();
+            this.showPreviewPlaceholder();
+
+            this.showToast('All content cleared', 'info');
+        }
+    },
+
+    async print() {
+        const formData = this.getFormData();
+        const quantity = parseInt(this.elements.printQuantity.value) || 1;
+
+        this.elements.printButton.disabled = true;
+        this.showStatus('info', 'Processing print request...');
+        this.showProgress(0);
+
+        try {
+            for (let i = 0; i < quantity; i++) {
+                const response = await fetch('/api/print/text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Print failed');
+                }
+
+                this.showProgress(((i + 1) / quantity) * 100);
+            }
+
+            this.showStatus('success', `Successfully printed ${quantity} label${quantity > 1 ? 's' : ''}`);
+            this.hideProgress();
+
+        } catch (error) {
+            this.showStatus('error', `Printing failed: ${error.message}`);
+            this.hideProgress();
+        } finally {
+            this.elements.printButton.disabled = false;
+        }
+    },
+
+    async download() {
+        try {
+            const formData = this.getFormData();
+
+            const response = await fetch('/api/preview/text?return_format=png', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData)
+            });
+
+            if (!response.ok) throw new Error('Download failed');
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `label-${new Date().toISOString().slice(0, 10)}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            this.showToast('Label downloaded successfully', 'success');
+        } catch (error) {
+            this.showToast('Download failed', 'error');
+        }
+    },
+
+    async share() {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Label Design',
+                    text: 'Check out this label design!',
+                    url: window.location.href
+                });
+            } catch (error) {
+                this.copyToClipboard();
+            }
+        } else {
+            this.copyToClipboard();
+        }
+    },
+
+    copyToClipboard() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            this.showToast('Link copied to clipboard', 'success');
+        }).catch(() => {
+            this.showToast('Failed to copy link', 'error');
+        });
+    },
+
+    handleLogoUpload(file) {
+        if (!file.type.startsWith('image/')) {
+            this.showToast('Please select an image file', 'error');
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            this.showToast('File size must be less than 2MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            // Store the image data for use in preview/print
+            this.logoData = e.target.result;
+            this.schedulePreview();
+            this.showToast('Logo uploaded successfully', 'success');
+        };
+        reader.readAsDataURL(file);
+    },
+
+    showFullPreview() {
+        if (this.elements.previewImage.src) {
+            this.elements.fullPreviewImage.src = this.elements.previewImage.src;
+            this.elements.fullPreviewModal.classList.remove('hidden');
+        }
+    },
+
+    // Utility methods
+    isInputFocused() {
+        const activeElement = document.activeElement;
+        return activeElement && (
+            activeElement.tagName === 'INPUT' ||
+            activeElement.tagName === 'TEXTAREA' ||
+            activeElement.contentEditable === 'true'
+        );
+    },
+
+    showStatus(type, message) {
+        const statusClasses = {
+            success: 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200 border border-green-200 dark:border-green-700',
+            error: 'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700',
+            info: 'bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 border border-blue-200 dark:border-blue-700'
+        };
+
+        this.elements.statusContainer.classList.remove('hidden');
+        this.elements.statusMessage.className = `p-4 rounded-lg ${statusClasses[type]}`;
+        this.elements.statusMessage.textContent = message;
+    },
+
+    showProgress(percent) {
+        this.elements.progressContainer.classList.remove('hidden');
+        this.elements.progressBar.style.width = `${percent}%`;
+        this.elements.progressPercent.textContent = `${Math.round(percent)}%`;
+    },
+
+    hideProgress() {
+        this.elements.progressContainer.classList.add('hidden');
+    },
+
+    showToast(message, type = 'info') {
+        if (window.uiManager && window.uiManager.showToast) {
+            window.uiManager.showToast(message, type);
+        }
+    },
+
+    startAutoPreview() {
+        // Generate initial preview after a short delay
+        setTimeout(() => {
+            this.schedulePreview();
+        }, 500);
+    },
+
+    saveToUndoStack() {
+        const state = {
+            text: Array.from(document.querySelectorAll('.line-text')).map(input => input.value),
+            fontSize: this.elements.fontSize.value,
+            alignment: this.state.currentAlignment,
+            styles: { ...this.state.textStyles }
+        };
+
+        this.state.undoStack.push(state);
+        if (this.state.undoStack.length > 50) {
+            this.state.undoStack.shift();
+        }
+        this.state.redoStack = [];
+    },
+
+    undo() {
+        if (this.state.undoStack.length > 0) {
+            const currentState = {
+                text: Array.from(document.querySelectorAll('.line-text')).map(input => input.value),
+                fontSize: this.elements.fontSize.value,
+                alignment: this.state.currentAlignment,
+                styles: { ...this.state.textStyles }
+            };
+
+            this.state.redoStack.push(currentState);
+
+            const previousState = this.state.undoStack.pop();
+            this.restoreState(previousState);
+        }
+    },
+
+    redo() {
+        if (this.state.redoStack.length > 0) {
+            const currentState = {
+                text: Array.from(document.querySelectorAll('.line-text')).map(input => input.value),
+                fontSize: this.elements.fontSize.value,
+                alignment: this.state.currentAlignment,
+                styles: { ...this.state.textStyles }
+            };
+
+            this.state.undoStack.push(currentState);
+
+            const nextState = this.state.redoStack.pop();
+            this.restoreState(nextState);
+        }
+    },
+
+    restoreState(state) {
+        // Restore text
+        const textInputs = document.querySelectorAll('.line-text');
+        state.text.forEach((text, index) => {
+            if (textInputs[index]) {
+                textInputs[index].value = text;
+            }
+        });
+
+        // Restore other settings
+        this.elements.fontSize.value = state.fontSize;
+        this.elements.fontSizeSlider.value = state.fontSize;
+        this.setAlignment(state.alignment);
+
+        Object.keys(state.styles).forEach(style => {
+            this.state.textStyles[style] = state.styles[style];
+            const btn = document.getElementById(`${style}Btn`);
+            if (btn) {
+                if (state.styles[style]) {
+                    btn.classList.add('bg-primary-100', 'dark:bg-primary-900');
+                } else {
+                    btn.classList.remove('bg-primary-100', 'dark:bg-primary-900');
+                }
+            }
+        });
+
+        this.updateCharCounter();
+        this.schedulePreview();
     }
-  });
-}
+};
 
-function setStatus(data) {
-  if (data['success'])
-    $('#statusPanel').html('<div id="statusBox" class="alert alert-success" role="alert"><i class="glyphicon glyphicon-check"></i><span>Printing was successful.</span></div>');
-  else
-    $('#statusPanel').html('<div id="statusBox" class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-alert"></i><span>Printing was unsuccessful:<br />'+data['message']+'</span></div>');
-  $('#printButton').prop('disabled', false);
-}
+// Initialize the enhanced label designer
+document.addEventListener('DOMContentLoaded', () => {
+    AdvancedLabelDesigner.init();
+});
 
-function print() {
-  $('#printButton').prop('disabled', true);
-  $('#statusPanel').html('<div id="statusBox" class="alert alert-info" role="alert"><i class="glyphicon glyphicon-hourglass"></i><span>Processing print request...</span></div>');
-  $.ajax({
-    type:     'POST',
-    dataType: 'json',
-    data:     formData(),
-    url:      '/api/print/text',
-    success:  setStatus,
-    error:    setStatus
-  });
-}
-
-preview()
-
+// Make it globally available
+window.AdvancedLabelDesigner = AdvancedLabelDesigner;
+</script>
 {% endblock %}

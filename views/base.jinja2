@@ -1,44 +1,562 @@
+{# Enhanced base.jinja2 with modern design system and advanced features #}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags always come first -->
+<html lang="en" class="h-full">
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/custom.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Professional Brother QL label printer web interface">
+    <meta name="theme-color" content="#0ea5e9">
     <title>{{ website['HTML_TITLE'] }} | Brother QL</title>
-  </head>
-  <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">{{ website['PAGE_TITLE'] }}</a>
-        </div>
-      </div>
-    </nav>
-    <div class="jumbotron">
-          <div class="container">
-            {% block jumbotron %}{% endblock %}
-          </div>
-    </div>
-    <div class="container">{% block content %}{% endblock %}</div>
 
-    <!-- jQuery first, then Bootstrap JS. -->
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-      {% block javascript %}{% endblock %}
+    <!-- Tailwind CSS with custom configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        },
+                        secondary: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            300: '#d6d3d1',
+                            400: '#a8a29e',
+                            500: '#78716c',
+                            600: '#57534e',
+                            700: '#44403c',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        error: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        }
+                    },
+                    fontFamily: {
+                        'display': ['Inter', 'system-ui', 'sans-serif'],
+                        'body': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'pulse-soft': 'pulseSoft 2s infinite',
+                        'bounce-soft': 'bounceSoft 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' },
+                        },
+                        bounceSoft: {
+                            '0%, 20%, 53%, 80%, 100%': { transform: 'translate3d(0,0,0)' },
+                            '40%, 43%': { transform: 'translate3d(0,-8px,0)' },
+                            '70%': { transform: 'translate3d(0,-4px,0)' },
+                            '90%': { transform: 'translate3d(0,-1px,0)' },
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                }
+            }
+        }
     </script>
-  </body>
-</html>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Heroicons for consistent iconography -->
+    <script src="https://unpkg.com/@heroicons/react@2.0.18/24/outline/index.js" type="module"></script>
+
+    <!-- Progressive Web App -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+</head>
+<body class="h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 font-body">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="flex flex-col items-center space-y-4">
+            <div class="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+            <p class="text-gray-600 dark:text-gray-300 animate-pulse">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Enhanced Navigation -->
+    <nav class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50 fixed w-full top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </div>
+                        <a href="/" class="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
+                            {{ website['PAGE_TITLE'] }}
+                        </a>
+                    </div>
+
+                    <!-- Navigation Menu -->
+                    <div class="hidden md:ml-8 md:flex md:space-x-1">
+                        <a href="/labeldesigner" class="nav-link bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Designer
+                        </a>
+                        <a href="/templates
+" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Templates
+                        </a>
+                        <a href="/history" class="nav-link text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right side controls -->
+                <div class="flex items-center space-x-3">
+                    <!-- Printer Status -->
+                    <div id="printerStatus" class="hidden md:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium">
+                        <div class="w-2 h-2 rounded-full"></div>
+                        <span>Checking...</span>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex items-center space-x-1">
+                        <button id="shortcutsBtn" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Keyboard Shortcuts (?)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </button>
+
+                        <button id="fullscreenBtn" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Fullscreen (F11)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                            </svg>
+                        </button>
+
+                        <button id="themeToggle" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Toggle Theme (T)">
+                            <svg id="darkIcon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                            </svg>
+                            <svg id="lightIcon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/labeldesigner" class="block px-3 py-2 rounded-md text-base font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/20">Designer</a>
+                <a href="/templates" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">Templates</a>
+                <a href="/history" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">History</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Header -->
+    <header class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-sm border-b border-gray-200/50 dark:border-gray-700/50 pt-16">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            {% block header %}{% endblock %}
+        </div>
+    </header>
+
+    <!-- Main Content with Enhanced Layout -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-200px)]">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border-t border-gray-200/50 dark:border-gray-700/50 mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                    <span>Brother QL Label Designer</span>
+                    <span class="hidden md:inline">•</span>
+                    <span class="hidden md:inline">Professional Label Printing</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="feedbackBtn" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                        Send Feedback
+                    </button>
+                    <a href="https://github.com/pklaus/brother_ql_web" target="_blank" class="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcutsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="min-h-screen px-4 text-center">
+            <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Keyboard Shortcuts</h3>
+                </div>
+                <div class="px-6 py-4 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-300">Toggle Theme</span>
+                        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">T</kbd>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-300">Print Label</span>
+                        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">Ctrl + P</kbd>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-300">Focus Text Input</span>
+                        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">Ctrl + /</kbd>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-300">Fullscreen</span>
+                        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">F11</kbd>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-300">Show Shortcuts</span>
+                        <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">?</kbd>
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 text-right">
+                    <button id="closeShortcuts" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    {% block scripts %}{% endblock %}
+
+    <!-- Enhanced Base JavaScript -->
+    <script>
+        // Enhanced Theme Manager with system preference detection
+        const themeManager = {
+            init() {
+                this.themeToggle = document.getElementById('themeToggle');
+                this.darkIcon = document.getElementById('darkIcon');
+                this.lightIcon = document.getElementById('lightIcon');
+
+                this.setupTheme();
+                this.bindEvents();
+                this.watchSystemPreference();
+            },
+
+            setupTheme() {
+                const isDark = localStorage.theme === 'dark' ||
+                    (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    this.lightIcon.classList.remove('hidden');
+                    this.darkIcon.classList.add('hidden');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    this.darkIcon.classList.remove('hidden');
+                    this.lightIcon.classList.add('hidden');
+                }
+            },
+
+            bindEvents() {
+                this.themeToggle.addEventListener('click', () => this.toggleTheme());
+
+                // Keyboard shortcut
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 't' || e.key === 'T') {
+                        if (!e.ctrlKey && !e.metaKey && !this.isInputFocused()) {
+                            e.preventDefault();
+                            this.toggleTheme();
+                        }
+                    }
+                });
+            },
+
+            toggleTheme() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                this.darkIcon.classList.toggle('hidden');
+                this.lightIcon.classList.toggle('hidden');
+
+                localStorage.theme = isDark ? 'dark' : 'light';
+
+                // Animate the transition
+                document.documentElement.style.transition = 'background-color 0.3s ease';
+                setTimeout(() => {
+                    document.documentElement.style.transition = '';
+                }, 300);
+            },
+
+            watchSystemPreference() {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    if (!localStorage.theme) {
+                        this.setupTheme();
+                    }
+                });
+            },
+
+            isInputFocused() {
+                const activeElement = document.activeElement;
+                return activeElement && (
+                    activeElement.tagName === 'INPUT' ||
+                    activeElement.tagName === 'TEXTAREA' ||
+                    activeElement.contentEditable === 'true'
+                );
+            }
+        };
+
+        // Enhanced UI Manager
+        const uiManager = {
+            init() {
+                this.setupMobileMenu();
+                this.setupShortcutsModal();
+                this.setupKeyboardShortcuts();
+                this.setupPrinterStatus();
+                this.setupFullscreen();
+                this.setupLoadingStates();
+            },
+
+            setupMobileMenu() {
+                const btn = document.getElementById('mobileMenuBtn');
+                const menu = document.getElementById('mobileMenu');
+
+                btn?.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            },
+
+            setupShortcutsModal() {
+                const btn = document.getElementById('shortcutsBtn');
+                const modal = document.getElementById('shortcutsModal');
+                const closeBtn = document.getElementById('closeShortcuts');
+
+                const showModal = () => {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('animate-fade-in');
+                };
+
+                const hideModal = () => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('animate-fade-in');
+                };
+
+                btn?.addEventListener('click', showModal);
+                closeBtn?.addEventListener('click', hideModal);
+                modal?.addEventListener('click', (e) => {
+                    if (e.target === modal) hideModal();
+                });
+
+                // Keyboard shortcut
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === '?' && !themeManager.isInputFocused()) {
+                        e.preventDefault();
+                        showModal();
+                    }
+                    if (e.key === 'Escape') {
+                        hideModal();
+                    }
+                });
+            },
+
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Focus text input with Ctrl+/
+                    if (e.ctrlKey && e.key === '/') {
+                        e.preventDefault();
+                        const textInput = document.getElementById('labelText');
+                        textInput?.focus();
+                    }
+
+                    // Print with Ctrl+P
+                    if (e.ctrlKey && e.key === 'p') {
+                        e.preventDefault();
+                        const printBtn = document.getElementById('printButton');
+                        printBtn?.click();
+                    }
+                });
+            },
+
+            setupPrinterStatus() {
+                const statusEl = document.getElementById('printerStatus');
+                if (!statusEl) return;
+
+                this.checkPrinterStatus();
+                setInterval(() => this.checkPrinterStatus(), 30000); // Check every 30s
+            },
+
+            async checkPrinterStatus() {
+                const statusEl = document.getElementById('printerStatus');
+                if (!statusEl) return;
+
+                try {
+                    const response = await fetch('/api/printer/status');
+                    const data = await response.json();
+
+                    statusEl.classList.remove('hidden');
+                    const dot = statusEl.querySelector('div');
+                    const text = statusEl.querySelector('span');
+
+                    if (data.online) {
+                        dot.className = 'w-2 h-2 rounded-full bg-green-500';
+                        text.textContent = 'Online';
+                        statusEl.className = 'hidden md:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300';
+                    } else {
+                        dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                        text.textContent = 'Offline';
+                        statusEl.className = 'hidden md:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300';
+                    }
+                } catch (error) {
+                    statusEl.classList.add('hidden');
+                }
+            },
+
+            setupFullscreen() {
+                const btn = document.getElementById('fullscreenBtn');
+
+                btn?.addEventListener('click', () => {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                });
+
+                // F11 shortcut
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'F11') {
+                        e.preventDefault();
+                        btn?.click();
+                    }
+                });
+            },
+
+            setupLoadingStates() {
+                window.showLoading = (message = 'Processing...') => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    const text = overlay.querySelector('p');
+                    text.textContent = message;
+                    overlay.classList.remove('hidden');
+                };
+
+                window.hideLoading = () => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    overlay.classList.add('hidden');
+                };
+            },
+
+            showToast(message, type = 'info', duration = 5000) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+
+                const colors = {
+                    success: 'bg-green-500 text-white',
+                    error: 'bg-red-500 text-white',
+                    warning: 'bg-yellow-500 text-gray-900',
+                    info: 'bg-blue-500 text-white'
+                };
+
+                toast.className = `${colors[type]} px-4 py-3 rounded-lg shadow-lg max-w-sm animate-slide-up`;
+                toast.textContent = message;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.animation = 'slideUp 0.3s ease-out reverse';
+                    setTimeout(() => container.removeChild(toast), 300);
+                }, duration);
+            }
+        };
+
+        // Performance monitoring
+        const performanceMonitor = {
+            init() {
+                this.measureLoadTime();
+                this.setupErrorHandling();
+            },
+
+            measureLoadTime() {
+                window.addEventListener('load', () => {
+                    const loadTime = performance.now();
+                    console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+                });
+            },
+
+            setupErrorHandling() {
+                window.addEventListener('error', (e) => {
+                    console.error('Global error:', e.error);
+                });
+
+                window.addEventListener('unhandledrejection', (e) => {
+                    console.error('Unhandled promise rejection:', e.reason);
+                });
+            }
+        };
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            themeManager.init();
+            uiManager.init();
+            performanceMonitor.init();
+        });
+
+        // Make managers globally available
+        window.themeManager = themeManager;
+        window.uiManager = uiManager;
+    </script>
+</body>
+</html>

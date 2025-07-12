@@ -1,0 +1,719 @@
+{# History page for viewing recently printed labels #}
+{% extends "base.jinja2" %}
+
+{% block header %}
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white animate-slide-up">Print History</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300 animate-slide-up" style="animation-delay: 100ms;">View and reprint your recent labels</p>
+        </div>
+
+        <div class="flex items-center space-x-3 animate-slide-up" style="animation-delay: 200ms;">
+            <button id="clearHistoryBtn" class="inline-flex items-center px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg text-sm font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Clear History
+            </button>
+
+            <button id="exportHistoryBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Export
+            </button>
+
+            <a href="/labeldesigner" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Label
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Filter and Search Bar -->
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-4 animate-scale-in">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div class="flex-1 max-w-lg">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search print history..."
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <select id="timeFilter" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+
+                <select id="statusFilter" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                    <option value="all">All Status</option>
+                    <option value="success">Successful</option>
+                    <option value="failed">Failed</option>
+                    <option value="pending">Pending</option>
+                </select>
+
+                <button id="refreshBtn" class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 animate-scale-in" style="animation-delay: 100ms;">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Labels</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="totalLabels">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Successful</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="successfulLabels">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Failed</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="failedLabels">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">This Week</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white" id="weeklyLabels">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History List -->
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 animate-scale-in" style="animation-delay: 200ms;">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Print History</h3>
+        </div>
+
+        <div class="divide-y divide-gray-200 dark:divide-gray-700" id="historyList">
+            <!-- History items will be populated here -->
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-12">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-8">
+            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No print history</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Start printing labels to see your history here.</p>
+            <a href="/labeldesigner" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create First Label
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-12">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-8">
+            <div class="flex flex-col items-center space-y-4">
+                <div class="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                <p class="text-gray-600 dark:text-gray-300">Loading history...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Label Details Modal -->
+<div id="labelModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 text-center">
+        <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Label Details</h3>
+                    <button id="closeModal" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="space-y-6">
+                    <!-- Label Preview -->
+                    <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <img id="modalPreview" class="w-full h-full object-contain" alt="Label preview">
+                    </div>
+
+                    <!-- Label Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Text Content</label>
+                            <p id="modalText" class="text-gray-900 dark:text-white whitespace-pre-wrap"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Label Size</label>
+                            <p id="modalSize" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Font</label>
+                            <p id="modalFont" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Print Time</label>
+                            <p id="modalTime" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                            <p id="modalStatus" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Copies</label>
+                            <p id="modalCopies" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 flex justify-between">
+                <button id="saveAsTemplate" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    Save as Template
+                </button>
+                <div class="flex space-x-3">
+                    <button id="downloadLabel" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        Download
+                    </button>
+                    <button id="reprintLabel" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        Reprint
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const HistoryManager = {
+    init() {
+        this.history = [];
+        this.filteredHistory = [];
+        this.selectedLabel = null;
+
+        this.elements = {
+            historyList: document.getElementById('historyList'),
+            searchInput: document.getElementById('searchInput'),
+            timeFilter: document.getElementById('timeFilter'),
+            statusFilter: document.getElementById('statusFilter'),
+            emptyState: document.getElementById('emptyState'),
+            loadingState: document.getElementById('loadingState'),
+            labelModal: document.getElementById('labelModal'),
+
+            // Statistics
+            totalLabels: document.getElementById('totalLabels'),
+            successfulLabels: document.getElementById('successfulLabels'),
+            failedLabels: document.getElementById('failedLabels'),
+            weeklyLabels: document.getElementById('weeklyLabels')
+        };
+
+        this.bindEvents();
+        this.loadHistory();
+    },
+
+    bindEvents() {
+        // Search and filters
+        this.elements.searchInput.addEventListener('input', () => this.filterHistory());
+        this.elements.timeFilter.addEventListener('change', () => this.filterHistory());
+        this.elements.statusFilter.addEventListener('change', () => this.filterHistory());
+
+        // Refresh
+        document.getElementById('refreshBtn').addEventListener('click', () => this.loadHistory());
+
+        // Clear history
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => this.clearHistory());
+
+        // Export history
+        document.getElementById('exportHistoryBtn').addEventListener('click', () => this.exportHistory());
+
+        // Modal events
+        document.getElementById('closeModal').addEventListener('click', () => {
+            this.elements.labelModal.classList.add('hidden');
+        });
+
+        document.getElementById('reprintLabel').addEventListener('click', () => this.reprintLabel());
+        document.getElementById('downloadLabel').addEventListener('click', () => this.downloadLabel());
+        document.getElementById('saveAsTemplate').addEventListener('click', () => this.saveAsTemplate());
+    },
+
+    async loadHistory() {
+        try {
+            this.elements.loadingState.classList.remove('hidden');
+            this.elements.emptyState.classList.add('hidden');
+
+            // In a real implementation, this would fetch from /api/history
+            // For now, we'll use localStorage or create mock data
+            const stored = localStorage.getItem('labelHistory');
+            if (stored) {
+                this.history = JSON.parse(stored);
+            } else {
+                this.history = this.generateMockHistory();
+            }
+
+            this.filteredHistory = [...this.history];
+            this.updateStatistics();
+            this.renderHistory();
+            this.elements.loadingState.classList.add('hidden');
+
+            if (this.history.length === 0) {
+                this.elements.emptyState.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('Failed to load history:', error);
+            this.elements.loadingState.classList.add('hidden');
+            this.elements.emptyState.classList.remove('hidden');
+        }
+    },
+
+    generateMockHistory() {
+        const mockLabels = [
+            { text: 'John Smith\nSenior Developer', size: '62', font: 'Arial', status: 'success' },
+            { text: 'Office Supplies\nRoom 204', size: '29', font: 'Helvetica', status: 'success' },
+            { text: 'FRAGILE\nHandle with Care', size: '62', font: 'Arial Bold', status: 'failed' },
+            { text: 'Sarah Johnson\nHR Manager', size: '62', font: 'Times New Roman', status: 'success' },
+            { text: 'Conference Room A\nBuilding 2', size: '29', font: 'Arial', status: 'success' }
+        ];
+
+        return mockLabels.map((label, index) => ({
+            id: `label_${Date.now()}_${index}`,
+            text: label.text,
+            labelSize: label.size,
+            fontFamily: label.font,
+            fontSize: 24,
+            alignment: 'center',
+            orientation: 'standard',
+            status: label.status,
+            timestamp: new Date(Date.now() - (index * 1000 * 60 * 60 * 24)).toISOString(),
+            copies: Math.floor(Math.random() * 5) + 1,
+            settings: {
+                marginTop: 5,
+                marginBottom: 5,
+                marginLeft: 5,
+                marginRight: 5
+            }
+        }));
+    },
+
+    filterHistory() {
+        const search = this.elements.searchInput.value.toLowerCase();
+        const timeFilter = this.elements.timeFilter.value;
+        const statusFilter = this.elements.statusFilter.value;
+
+        this.filteredHistory = this.history.filter(item => {
+            const matchesSearch = !search || item.text.toLowerCase().includes(search);
+            const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+            const matchesTime = this.matchesTimeFilter(item.timestamp, timeFilter);
+
+            return matchesSearch && matchesStatus && matchesTime;
+        });
+
+        this.renderHistory();
+    },
+
+    matchesTimeFilter(timestamp, filter) {
+        if (filter === 'all') return true;
+
+        const date = new Date(timestamp);
+        const now = new Date();
+
+        switch (filter) {
+            case 'today':
+                return date.toDateString() === now.toDateString();
+            case 'week':
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return date >= weekAgo;
+            case 'month':
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                return date >= monthAgo;
+            case 'year':
+                const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                return date >= yearAgo;
+            default:
+                return true;
+        }
+    },
+
+    updateStatistics() {
+        const total = this.history.length;
+        const successful = this.history.filter(item => item.status === 'success').length;
+        const failed = this.history.filter(item => item.status === 'failed').length;
+
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const weekly = this.history.filter(item => new Date(item.timestamp) >= weekAgo).length;
+
+        this.elements.totalLabels.textContent = total;
+        this.elements.successfulLabels.textContent = successful;
+        this.elements.failedLabels.textContent = failed;
+        this.elements.weeklyLabels.textContent = weekly;
+    },
+
+    renderHistory() {
+        const container = this.elements.historyList;
+        container.innerHTML = '';
+
+        if (this.filteredHistory.length === 0) {
+            this.elements.emptyState.classList.remove('hidden');
+            return;
+        } else {
+            this.elements.emptyState.classList.add('hidden');
+        }
+
+        this.filteredHistory.forEach(item => {
+            const historyItem = this.createHistoryItem(item);
+            container.appendChild(historyItem);
+        });
+    },
+
+    createHistoryItem(item) {
+        const div = document.createElement('div');
+        div.className = 'px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer';
+
+        const statusIcon = this.getStatusIcon(item.status);
+        const statusColor = this.getStatusColor(item.status);
+
+        div.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 ${statusColor} rounded-lg flex items-center justify-center">
+                            ${statusIcon}
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-3">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                ${item.text.split('\n')[0]}
+                            </p>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                ${item.labelSize}mm
+                            </span>
+                        </div>
+                        <div class="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                            <span>${this.formatDate(item.timestamp)}</span>
+                            <span>•</span>
+                            <span>${item.fontFamily}</span>
+                            <span>•</span>
+                            <span>${item.copies} ${item.copies === 1 ? 'copy' : 'copies'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="reprint-btn p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" title="Reprint">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                        </svg>
+                    </button>
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </div>
+        `;
+
+        // Bind events
+        div.addEventListener('click', (e) => {
+            if (!e.target.closest('.reprint-btn')) {
+                this.showLabelDetails(item);
+            }
+        });
+
+        div.querySelector('.reprint-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.reprintLabel(item);
+        });
+
+        return div;
+    },
+
+    getStatusIcon(status) {
+        const icons = {
+            success: '<svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+            failed: '<svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>',
+            pending: '<svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+        };
+        return icons[status] || icons.pending;
+    },
+
+    getStatusColor(status) {
+        const colors = {
+            success: 'bg-green-100 dark:bg-green-900',
+            failed: 'bg-red-100 dark:bg-red-900',
+            pending: 'bg-yellow-100 dark:bg-yellow-900'
+        };
+        return colors[status] || colors.pending;
+    },
+
+    showLabelDetails(item) {
+        this.selectedLabel = item;
+
+        document.getElementById('modalTitle').textContent = `Label: ${item.text.split('\n')[0]}`;
+        document.getElementById('modalText').textContent = item.text;
+        document.getElementById('modalSize').textContent = `${item.labelSize}mm`;
+        document.getElementById('modalFont').textContent = `${item.fontFamily} (${item.fontSize}pt)`;
+        document.getElementById('modalTime').textContent = this.formatDate(item.timestamp);
+        document.getElementById('modalStatus').textContent = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+        document.getElementById('modalCopies').textContent = item.copies;
+
+        this.elements.labelModal.classList.remove('hidden');
+    },
+
+    async reprintLabel(item = null) {
+        const targetItem = item || this.selectedLabel;
+        if (!targetItem) return;
+
+        try {
+            const formData = {
+                text: targetItem.text,
+                font_family: targetItem.fontFamily,
+                font_size: targetItem.fontSize,
+                label_size: targetItem.labelSize,
+                align: targetItem.alignment,
+                orientation: targetItem.orientation || 'standard'
+            };
+
+            const response = await fetch('/api/print/text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (window.uiManager && window.uiManager.showToast) {
+                    window.uiManager.showToast('Label reprinted successfully', 'success');
+                }
+
+                // Add to history
+                const newItem = {
+                    ...targetItem,
+                    id: `label_${Date.now()}`,
+                    timestamp: new Date().toISOString(),
+                    status: 'success'
+                };
+                this.history.unshift(newItem);
+                this.saveHistory();
+                this.filterHistory();
+                this.updateStatistics();
+            } else {
+                throw new Error(data.message || 'Print failed');
+            }
+        } catch (error) {
+            if (window.uiManager && window.uiManager.showToast) {
+                window.uiManager.showToast(`Reprint failed: ${error.message}`, 'error');
+            }
+        }
+    },
+
+    downloadLabel() {
+        if (!this.selectedLabel) return;
+
+        // In a real implementation, this would generate and download the label image
+        const labelData = {
+            text: this.selectedLabel.text,
+            settings: this.selectedLabel
+        };
+
+        const dataStr = JSON.stringify(labelData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `label-${this.selectedLabel.id}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (window.uiManager && window.uiManager.showToast) {
+            window.uiManager.showToast('Label data downloaded', 'success');
+        }
+    },
+
+    saveAsTemplate() {
+        if (!this.selectedLabel) return;
+
+        const templateData = {
+            name: `Template from ${this.selectedLabel.text.split('\n')[0]}`,
+            text: [this.selectedLabel.text],
+            fontSize: this.selectedLabel.fontSize,
+            fontFamily: this.selectedLabel.fontFamily,
+            alignment: this.selectedLabel.alignment,
+            labelSize: this.selectedLabel.labelSize,
+            orientation: this.selectedLabel.orientation,
+            created: new Date().toISOString()
+        };
+
+        // Redirect to label designer with template data
+        const params = new URLSearchParams();
+        params.set('template', JSON.stringify(templateData));
+        window.location.href = `/labeldesigner?${params.toString()}`;
+    },
+
+    clearHistory() {
+        if (confirm('Are you sure you want to clear all print history? This action cannot be undone.')) {
+            this.history = [];
+            this.filteredHistory = [];
+            this.saveHistory();
+            this.updateStatistics();
+            this.renderHistory();
+
+            if (window.uiManager && window.uiManager.showToast) {
+                window.uiManager.showToast('History cleared', 'info');
+            }
+        }
+    },
+
+    exportHistory() {
+        const exportData = {
+            exportDate: new Date().toISOString(),
+            totalItems: this.history.length,
+            history: this.history
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `label-history-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (window.uiManager && window.uiManager.showToast) {
+            window.uiManager.showToast('History exported successfully', 'success');
+        }
+    },
+
+    saveHistory() {
+        localStorage.setItem('labelHistory', JSON.stringify(this.history));
+    },
+
+    formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+
+        return date.toLocaleDateString();
+    }
+};
+
+// Add item to history when a label is printed
+window.addToHistory = function(labelData) {
+    const historyItem = {
+        id: `label_${Date.now()}`,
+        text: labelData.text,
+        labelSize: labelData.label_size,
+        fontFamily: labelData.font_family,
+        fontSize: labelData.font_size,
+        alignment: labelData.align,
+        orientation: labelData.orientation,
+        status: 'success',
+        timestamp: new Date().toISOString(),
+        copies: labelData.copies || 1,
+        settings: labelData
+    };
+
+    const stored = localStorage.getItem('labelHistory');
+    const history = stored ? JSON.parse(stored) : [];
+    history.unshift(historyItem);
+
+    // Keep only last 100 items
+    if (history.length > 100) {
+        history.splice(100);
+    }
+
+    localStorage.setItem('labelHistory', JSON.stringify(history));
+};
+
+// Initialize history manager
+document.addEventListener('DOMContentLoaded', () => {
+    HistoryManager.init();
+});
+
+// Make it globally available
+window.HistoryManager = HistoryManager;
+</script>
+{% endblock %}

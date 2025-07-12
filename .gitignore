@@ -1,5 +1,7 @@
 # ignore config.json
 config.json
+.stash
+.envrc
 
 ### Python template
 # Byte-compiled / optimized / DLL files

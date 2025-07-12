@@ -14,14 +14,34 @@
     "DEFAULT_ORIENTATION": "standard",
     "DEFAULT_FONT_SIZE": 70,
     "DEFAULT_FONTS": [
-      {"family": "Minion Pro",      "style": "Semibold"},
-      {"family": "Linux Libertine", "style": "Regular"},
-      {"family": "DejaVu Serif",    "style": "Book"}
+      { "family": "Minion Pro", "style": "Semibold" },
+      { "family": "Linux Libertine", "style": "Regular" },
+      { "family": "DejaVu Serif", "style": "Book" },
+      { "family": "Arial", "style": "Regular" },
+      { "family": "Helvetica", "style": "Regular" }
     ]
   },
   "WEBSITE": {
     "HTML_TITLE": "Label Designer",
     "PAGE_TITLE": "Brother QL Label Designer",
     "PAGE_HEADLINE": "Design your label and print it…"
-  }
+  },
+  "FONT_WHITELIST": [
+    "Arial",
+    "Helvetica",
+    "Times New Roman",
+    "Courier New",
+    "DejaVu Sans",
+    "DejaVu Serif",
+    "DejaVu Sans Mono",
+    "Liberation Sans",
+    "Liberation Serif",
+    "Liberation Mono",
+    "Linux Libertine",
+    "Minion Pro",
+    "Source Sans Pro",
+    "Source Serif Pro",
+    "Ubuntu",
+    "Roboto"
+  ]
 }

@@ -1,0 +1,593 @@
+{# Templates page for managing label templates #}
+{% extends "base.jinja2" %}
+
+{% block header %}
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white animate-slide-up">Label Templates</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300 animate-slide-up" style="animation-delay: 100ms;">Save, organize, and reuse your label designs</p>
+        </div>
+
+        <div class="flex items-center space-x-3 animate-slide-up" style="animation-delay: 200ms;">
+            <button id="uploadTemplateBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Import
+            </button>
+
+            <a href="/labeldesigner" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Template
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Search and Filter Bar -->
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-4 animate-scale-in">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div class="flex-1 max-w-lg">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search templates..."
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white">
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <select id="categoryFilter" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                    <option value="">All Categories</option>
+                    <option value="name-tags">Name Tags</option>
+                    <option value="shipping">Shipping</option>
+                    <option value="organization">Organization</option>
+                    <option value="qr-codes">QR Codes</option>
+                    <option value="custom">Custom</option>
+                </select>
+
+                <select id="sortOrder" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500">
+                    <option value="recent">Recently Used</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="created">Date Created</option>
+                    <option value="size">Label Size</option>
+                </select>
+
+                <button id="viewToggle" class="p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                    <svg id="gridIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    <svg id="listIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div id="templatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Templates will be populated here by JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-12">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-8">
+            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No templates found</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Get started by creating your first template or importing existing ones.</p>
+            <a href="/labeldesigner" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Create Template
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-12">
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 p-8">
+            <div class="flex flex-col items-center space-y-4">
+                <div class="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+                <p class="text-gray-600 dark:text-gray-300">Loading templates...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Details Modal -->
+<div id="templateModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 text-center">
+        <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Template Details</h3>
+                    <button id="closeModal" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="space-y-6">
+                    <!-- Template Preview -->
+                    <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                        <img id="modalPreview" class="w-full h-full object-contain" alt="Template preview">
+                    </div>
+
+                    <!-- Template Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                            <p id="modalName" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                            <p id="modalCategory" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Label Size</label>
+                            <p id="modalSize" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Created</label>
+                            <p id="modalCreated" class="text-gray-900 dark:text-white"></p>
+                        </div>
+                    </div>
+
+                    <!-- Template Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <p id="modalDescription" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 flex justify-between">
+                <div class="flex space-x-3">
+                    <button id="exportTemplate" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        Export
+                    </button>
+                    <button id="duplicateTemplate" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        Duplicate
+                    </button>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="deleteTemplate" class="px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                        Delete
+                    </button>
+                    <button id="useTemplate" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        Use Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Template Modal -->
+<div id="uploadModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="min-h-screen px-4 text-center">
+        <div class="inline-block align-middle bg-white dark:bg-gray-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Import Template</h3>
+            </div>
+
+            <div class="p-6">
+                <div id="uploadDropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-400 dark:hover:border-primary-500 transition-colors cursor-pointer">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-lg font-medium text-gray-900 dark:text-white mb-2">Drop template file here</p>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">or click to browse</p>
+                    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        Select File
+                    </button>
+                </div>
+                <input type="file" id="templateFileInput" accept=".json" class="hidden">
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 text-right">
+                <button id="closeUploadModal" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mr-3">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const TemplatesManager = {
+    init() {
+        this.templates = [];
+        this.filteredTemplates = [];
+        this.currentView = 'grid';
+        this.selectedTemplate = null;
+
+        this.elements = {
+            container: document.getElementById('templatesContainer'),
+            searchInput: document.getElementById('searchInput'),
+            categoryFilter: document.getElementById('categoryFilter'),
+            sortOrder: document.getElementById('sortOrder'),
+            viewToggle: document.getElementById('viewToggle'),
+            emptyState: document.getElementById('emptyState'),
+            loadingState: document.getElementById('loadingState'),
+
+            // Modals
+            templateModal: document.getElementById('templateModal'),
+            uploadModal: document.getElementById('uploadModal'),
+            uploadDropZone: document.getElementById('uploadDropZone'),
+            templateFileInput: document.getElementById('templateFileInput')
+        };
+
+        this.bindEvents();
+        this.loadTemplates();
+    },
+
+    bindEvents() {
+        // Search and filters
+        this.elements.searchInput.addEventListener('input', () => this.filterTemplates());
+        this.elements.categoryFilter.addEventListener('change', () => this.filterTemplates());
+        this.elements.sortOrder.addEventListener('change', () => this.sortTemplates());
+
+        // View toggle
+        this.elements.viewToggle.addEventListener('click', () => this.toggleView());
+
+        // Upload
+        document.getElementById('uploadTemplateBtn').addEventListener('click', () => {
+            this.elements.uploadModal.classList.remove('hidden');
+        });
+
+        this.elements.uploadDropZone.addEventListener('click', () => {
+            this.elements.templateFileInput.click();
+        });
+
+        this.elements.uploadDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.uploadDropZone.classList.add('border-primary-400');
+        });
+
+        this.elements.uploadDropZone.addEventListener('dragleave', () => {
+            this.elements.uploadDropZone.classList.remove('border-primary-400');
+        });
+
+        this.elements.uploadDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.uploadDropZone.classList.remove('border-primary-400');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                this.handleFileUpload(files[0]);
+            }
+        });
+
+        this.elements.templateFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        // Modal events
+        document.getElementById('closeModal').addEventListener('click', () => {
+            this.elements.templateModal.classList.add('hidden');
+        });
+
+        document.getElementById('closeUploadModal').addEventListener('click', () => {
+            this.elements.uploadModal.classList.add('hidden');
+        });
+
+        document.getElementById('useTemplate').addEventListener('click', () => {
+            this.useTemplate();
+        });
+
+        document.getElementById('deleteTemplate').addEventListener('click', () => {
+            this.deleteTemplate();
+        });
+
+        document.getElementById('exportTemplate').addEventListener('click', () => {
+            this.exportTemplate();
+        });
+
+        document.getElementById('duplicateTemplate').addEventListener('click', () => {
+            this.duplicateTemplate();
+        });
+    },
+
+    async loadTemplates() {
+        try {
+            this.elements.loadingState.classList.remove('hidden');
+            this.elements.emptyState.classList.add('hidden');
+
+            const response = await fetch('/api/templates');
+            const data = await response.json();
+
+            this.templates = data.templates || [];
+            this.filteredTemplates = [...this.templates];
+
+            this.renderTemplates();
+            this.elements.loadingState.classList.add('hidden');
+
+            if (this.templates.length === 0) {
+                this.elements.emptyState.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            console.error('Failed to load templates:', error);
+            this.elements.loadingState.classList.add('hidden');
+            this.elements.emptyState.classList.remove('hidden');
+        }
+    },
+
+    filterTemplates() {
+        const search = this.elements.searchInput.value.toLowerCase();
+        const category = this.elements.categoryFilter.value;
+
+        this.filteredTemplates = this.templates.filter(template => {
+            const matchesSearch = !search ||
+                template.name.toLowerCase().includes(search) ||
+                (template.description || '').toLowerCase().includes(search);
+
+            const matchesCategory = !category || template.category === category;
+
+            return matchesSearch && matchesCategory;
+        });
+
+        this.sortTemplates();
+        this.renderTemplates();
+    },
+
+    sortTemplates() {
+        const sortBy = this.elements.sortOrder.value;
+
+        this.filteredTemplates.sort((a, b) => {
+            switch (sortBy) {
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'created':
+                    return new Date(b.created || 0) - new Date(a.created || 0);
+                case 'size':
+                    return a.label_size.localeCompare(b.label_size);
+                case 'recent':
+                default:
+                    return new Date(b.lastUsed || b.created || 0) - new Date(a.lastUsed || a.created || 0);
+            }
+        });
+    },
+
+    renderTemplates() {
+        const container = this.elements.container;
+        container.innerHTML = '';
+
+        if (this.filteredTemplates.length === 0) {
+            this.elements.emptyState.classList.remove('hidden');
+            return;
+        } else {
+            this.elements.emptyState.classList.add('hidden');
+        }
+
+        this.filteredTemplates.forEach(template => {
+            const templateCard = this.createTemplateCard(template);
+            container.appendChild(templateCard);
+        });
+    },
+
+    createTemplateCard(template) {
+        const card = document.createElement('div');
+        card.className = 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-all duration-300 cursor-pointer group';
+
+        card.innerHTML = `
+            <div class="p-4">
+                <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg mb-3 overflow-hidden">
+                    <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        ${template.name}
+                    </h3>
+
+                    <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                            ${template.label_size || 'Unknown'}
+                        </span>
+                        <span>${this.formatDate(template.created || template.lastUsed)}</span>
+                    </div>
+
+                    ${template.description ? `<p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">${template.description}</p>` : ''}
+                </div>
+
+                <div class="mt-4 flex justify-between items-center">
+                    <button class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                        View Details
+                    </button>
+                    <button class="px-3 py-1 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 transition-colors">
+                        Use
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Bind events
+        card.querySelector('button:last-child').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.useTemplate(template);
+        });
+
+        card.addEventListener('click', () => {
+            this.showTemplateDetails(template);
+        });
+
+        return card;
+    },
+
+    showTemplateDetails(template) {
+        this.selectedTemplate = template;
+
+        document.getElementById('modalTitle').textContent = template.name;
+        document.getElementById('modalName').textContent = template.name;
+        document.getElementById('modalCategory').textContent = template.category || 'Uncategorized';
+        document.getElementById('modalSize').textContent = template.label_size || 'Unknown';
+        document.getElementById('modalCreated').textContent = this.formatDate(template.created);
+        document.getElementById('modalDescription').textContent = template.description || 'No description available';
+
+        this.elements.templateModal.classList.remove('hidden');
+    },
+
+    useTemplate(template = null) {
+        const targetTemplate = template || this.selectedTemplate;
+        if (!targetTemplate) return;
+
+        // Redirect to label designer with template data
+        const params = new URLSearchParams();
+        params.set('template', JSON.stringify(targetTemplate));
+        window.location.href = `/labeldesigner?${params.toString()}`;
+    },
+
+    async deleteTemplate() {
+        if (!this.selectedTemplate) return;
+
+        if (confirm(`Are you sure you want to delete "${this.selectedTemplate.name}"?`)) {
+            try {
+                // In a real implementation, you'd call DELETE /api/templates/:id
+                this.templates = this.templates.filter(t => t.name !== this.selectedTemplate.name);
+                this.filterTemplates();
+                this.elements.templateModal.classList.add('hidden');
+
+                if (window.uiManager && window.uiManager.showToast) {
+                    window.uiManager.showToast('Template deleted successfully', 'success');
+                }
+            } catch (error) {
+                if (window.uiManager && window.uiManager.showToast) {
+                    window.uiManager.showToast('Failed to delete template', 'error');
+                }
+            }
+        }
+    },
+
+    exportTemplate() {
+        if (!this.selectedTemplate) return;
+
+        const dataStr = JSON.stringify(this.selectedTemplate, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.selectedTemplate.name.replace(/\s+/g, '_')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        if (window.uiManager && window.uiManager.showToast) {
+            window.uiManager.showToast('Template exported successfully', 'success');
+        }
+    },
+
+    duplicateTemplate() {
+        if (!this.selectedTemplate) return;
+
+        const duplicate = {
+            ...this.selectedTemplate,
+            name: `${this.selectedTemplate.name} (Copy)`,
+            created: new Date().toISOString()
+        };
+
+        this.templates.push(duplicate);
+        this.filterTemplates();
+        this.elements.templateModal.classList.add('hidden');
+
+        if (window.uiManager && window.uiManager.showToast) {
+            window.uiManager.showToast('Template duplicated successfully', 'success');
+        }
+    },
+
+    handleFileUpload(file) {
+        if (!file.name.endsWith('.json')) {
+            if (window.uiManager && window.uiManager.showToast) {
+                window.uiManager.showToast('Please select a JSON file', 'error');
+            }
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const template = JSON.parse(e.target.result);
+                template.created = new Date().toISOString();
+
+                this.templates.push(template);
+                this.filterTemplates();
+                this.elements.uploadModal.classList.add('hidden');
+
+                if (window.uiManager && window.uiManager.showToast) {
+                    window.uiManager.showToast('Template imported successfully', 'success');
+                }
+            } catch (error) {
+                if (window.uiManager && window.uiManager.showToast) {
+                    window.uiManager.showToast('Invalid template file', 'error');
+                }
+            }
+        };
+        reader.readAsText(file);
+    },
+
+    toggleView() {
+        this.currentView = this.currentView === 'grid' ? 'list' : 'grid';
+
+        const gridIcon = document.getElementById('gridIcon');
+        const listIcon = document.getElementById('listIcon');
+
+        if (this.currentView === 'grid') {
+            gridIcon.classList.remove('hidden');
+            listIcon.classList.add('hidden');
+            this.elements.container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+        } else {
+            gridIcon.classList.add('hidden');
+            listIcon.classList.remove('hidden');
+            this.elements.container.className = 'space-y-4';
+        }
+
+        this.renderTemplates();
+    },
+
+    formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+
+        return date.toLocaleDateString();
+    }
+};
+
+// Initialize templates manager
+document.addEventListener('DOMContentLoaded', () => {
+    TemplatesManager.init();
+});
+
+// Make it globally available
+window.TemplatesManager = TemplatesManager;

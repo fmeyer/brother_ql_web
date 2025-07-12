@@ -12,7 +12,7 @@ There's also a screenshot showing [how it looks on a smartphone](./static/images
 ### Installation
 
 **ProTip™**: If you know how to use Docker, you might want to use my ready-to-use Docker image to deploy this software.
-It can be found [on the Docker hub](https://hub.docker.com/r/pklaus/brother_ql_web/).  
+It can be found [on the Docker hub](https://hub.docker.com/r/pklaus/brother_ql_web/).
 Otherwise, follow the instructions below.
 
 Get the code:
@@ -34,6 +34,22 @@ fontconfig using [`brew install fontconfig`](http://brewformulas.org/Fontconfig)
 
 Copy `config.example.json` to `config.json` (e.g. `cp config.example.json config.json`) and adjust the values to match your needs.
 
+#### Font Whitelist Configuration
+
+font whitelist feature to improve performance by avoiding loading all system fonts. You can configure which font families should be available in the label designer:
+
+```json
+{
+  "FONT_WHITELIST": [
+    "Arial",
+    "Helvetica",
+    "Times New Roman",
+    "DejaVu Sans",
+    "Liberation Sans"
+  ]
+}
+```
+
 ### Startup
 
 To start the server, run `./brother_ql_web.py`. The command line parameters overwrite the values configured in `config.json`. Here's its command line interface:
@@ -44,13 +60,13 @@ To start the server, run `./brother_ql_web.py`. The command line parameters over
                              [--default-orientation {standard,rotated}]
                              [--model {QL-500,QL-550,QL-560,QL-570,QL-580N,QL-650TD,QL-700,QL-710W,QL-720NW,QL-1050,QL-1060N}]
                              [printer]
-    
+
     This is a web service to print labels on Brother QL label printers.
-    
+
     positional arguments:
       printer               String descriptor for the printer to use (like
                             tcp://192.168.0.23:9100 or file:///dev/usb/lp0)
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       --port PORT
